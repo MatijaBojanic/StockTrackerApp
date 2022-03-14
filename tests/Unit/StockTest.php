@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-
 use App\Clients\Client;
 use App\Clients\ClientException;
 use App\Clients\StockStatus;

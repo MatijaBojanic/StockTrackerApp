@@ -18,7 +18,7 @@ class TrackCommandTest extends TestCase
     {
         $this->seed(RetailerWithProductSeeder::class);
         $this->assertFalse(Product::first()->inStock());
-        \Http::fake(fn () => ['available' => true, 'price' => 29900]);
+        \Http::fake(fn () => ['onlineAvailability' => true, 'salePrice' => 29900]);
         $this->artisan('track');
         $this->assertTrue(Product::first()->inStock());
     }
