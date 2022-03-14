@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
+use App\Clients\BestBuy;
+use App\Clients\ClientException;
+use App\Clients\ClientFactory;
+use App\Clients\Target;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * App\Models\Stock
@@ -16,23 +21,24 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Stock extends Model
 {
-    protected $casts =[
+    protected $casts = [
         'in_stock' => 'boolean'
     ];
     use HasFactory;
 
-    public function track(){
-        if($this->retailer->name == 'Best Buy') {
-            $results = \Http::get('http://foo.test')->json();
+    public function track()
+    {
+        $stockStatus = (new ClientFactory())->make($this->retailer)
+            ->checkAvailability($this);
 
-            $this->update([
-               'in_stock' => $results['available'],
-                'price' => $results['price'],
-            ]);
-        }
+        $this->update([
+            'in_stock' => $stockStatus->available,
+            'price' => $stockStatus->price,
+        ]);
     }
 
-    public function retailer(){
+    public function retailer()
+    {
         return $this->belongsTo(Retailer::class);
     }
 
