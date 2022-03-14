@@ -23,8 +23,17 @@ class BestBuyTest extends TestCase
         try {
             $stockStatus = (new BestBuy())->checkAvailability($stock);
         } catch(\Exception $e){
-            $this->fail('Failed to track the BestBuy Api properly');
+            $this->fail('Failed to track the BestBuy Api properly'.$e->getMessage());
         }
         $this->assertTrue(true);
+    }
+    /** @test */
+    function it_creates_the_proper_stock_status_response()
+    {
+        \Http::fake(fn()=> ['salePrice' => 299.99, 'onlineAvailability' => true]);
+        $stockStatus = (new BestBuy())->checkAvailability(new Stock());
+
+        $this->assertEquals(29999, $stockStatus->price);
+        $this->assertTrue($stockStatus->available);
     }
 }
