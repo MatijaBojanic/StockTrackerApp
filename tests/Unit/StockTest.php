@@ -3,10 +3,13 @@
 namespace Tests\Unit;
 
 
+use App\Clients\Client;
 use App\Clients\ClientException;
+use App\Clients\StockStatus;
 use App\Models\Retailer;
 use App\Models\Stock;
 use Database\Seeders\RetailerWithProductSeeder;
+use Facades\App\Clients\ClientFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,4 +24,25 @@ class StockTest extends TestCase
         $this->expectException(ClientException::class);
         Stock::first()->track();
     }
+    /** @test */
+    function it_updates_local_stock_status_after_being_tracked()
+    {
+        $this->seed(RetailerWithProductSeeder::class);
+
+        ClientFactory::shouldReceive('make')->andReturn(new FakeClient);
+
+        $stock = tap(Stock::first())->track();
+        $this->assertTrue($stock->in_stock);
+        $this->assertEquals(9900, $stock->price);
+
+    }
+}
+
+class FakeClient implements Client
+{
+    public function checkAvailability(Stock $stock): StockStatus
+    {
+        return new StockStatus($available = true,$price =9900);
+    }
+
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Clients\BestBuy;
 use App\Clients\ClientException;
-use App\Clients\ClientFactory;
+use Facades\App\Clients\ClientFactory;
 use App\Clients\Target;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,8 +28,7 @@ class Stock extends Model
 
     public function track()
     {
-        $stockStatus = (new ClientFactory())->make($this->retailer)
-            ->checkAvailability($this);
+        $stockStatus = $this->retailer->client()->checkAvailability($this);
 
         $this->update([
             'in_stock' => $stockStatus->available,
