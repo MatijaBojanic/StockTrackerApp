@@ -28,7 +28,7 @@ class StockTest extends TestCase
     {
         $this->seed(RetailerWithProductSeeder::class);
 
-        ClientFactory::shouldReceive('make')->andReturn(new FakeClient);
+        $this->mockClientRequest($available=true, $price = 9900);
 
         $stock = tap(Stock::first())->track();
         $this->assertTrue($stock->in_stock);

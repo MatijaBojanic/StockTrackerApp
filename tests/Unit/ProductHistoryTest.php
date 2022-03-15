@@ -18,8 +18,7 @@ class ProductHistoryTest extends TestCase
     public function it_records_history_each_time_stock_is_tracked()
     {
         $this->seed(RetailerWithProductSeeder::class);
-        ClientFactory::shouldReceive('make->checkAvailability')
-            ->andReturn(new StockStatus($available = true, $price = 99));
+        $this->mockClientRequest($available = true, $price = 9900);
 
         $product = Product::first();
         $this->assertCount(0, $product->history);
