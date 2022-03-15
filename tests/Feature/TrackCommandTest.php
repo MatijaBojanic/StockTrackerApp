@@ -38,28 +38,4 @@ class TrackCommandTest extends TestCase
 
         $this->assertTrue(Product::first()->inStock());
     }
-
-    /** @test */
-    function it_notifies_the_user_when_the_stock_is_now_available()
-    {
-
-        TestCase::mockClientRequest();
-
-        $this->artisan('track');
-
-        Notification::assertSentTo(User::first(), ImportantStockUpdate::class);
-    }
-
-
-    /** @test */
-    function it_does_not_notify_the_user_when_the_stock_remains_unavailable()
-    {
-
-        TestCase::mockClientRequest(false);
-
-        $this->artisan('track');
-
-        Notification::assertNothingSent();
-    }
-
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Clients\BestBuy;
 use App\Clients\ClientException;
 use App\Events\NowInStock;
+use App\UseCases\TrackStock;
 use Database\Factories\StockFactory;
 use Eloquent;
 use Facades\App\Clients\ClientFactory;
@@ -32,18 +33,8 @@ class Stock extends Model
 
     public function track($callback = null)
     {
-        $stockStatus = $this->retailer->client()->checkAvailability($this);
+        TrackStock::dispatch($this);
 
-        if(! $this->in_stock && $stockStatus->available){
-            event(new NowInStock($this));
-        }
-
-
-        $this->update([
-            'in_stock' => $stockStatus->available,
-            'price' => $stockStatus->price,
-        ]);
-        $callback && $callback($this);
     }
 
     public function retailer()
