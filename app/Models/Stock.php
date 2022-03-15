@@ -4,8 +4,11 @@ namespace App\Models;
 
 use App\Clients\BestBuy;
 use App\Clients\ClientException;
+use Database\Factories\StockFactory;
+use Eloquent;
 use Facades\App\Clients\ClientFactory;
 use App\Clients\Target;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -13,11 +16,11 @@ use Illuminate\Support\Str;
 /**
  * App\Models\Stock
  *
- * @method static \Database\Factories\StockFactory factory(...$parameters)
- * @method static \Illuminate\Database\Eloquent\Builder|Stock newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Stock newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Stock query()
- * @mixin \Eloquent
+ * @method static StockFactory factory(...$parameters)
+ * @method static Builder|Stock newModelQuery()
+ * @method static Builder|Stock newQuery()
+ * @method static Builder|Stock query()
+ * @mixin Eloquent
  */
 class Stock extends Model
 {
@@ -26,14 +29,14 @@ class Stock extends Model
     ];
     use HasFactory;
 
-    public function track()
+    public function track($callback = null)
     {
         $stockStatus = $this->retailer->client()->checkAvailability($this);
-
         $this->update([
             'in_stock' => $stockStatus->available,
             'price' => $stockStatus->price,
         ]);
+        $callback && $callback($this);
     }
 
     public function retailer()
@@ -41,4 +44,8 @@ class Stock extends Model
         return $this->belongsTo(Retailer::class);
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
